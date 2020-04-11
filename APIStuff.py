@@ -100,12 +100,20 @@ def write_csv(filename):
         fle.write(f'\n{country},{days_to_50(country)}')
     fle.close()
 
+# Task 4: Dump json sting of dictionaty of day:tuples
+def write_json(filename):
+    full_path = os.path.join(os.path.dirname(__file__), filename)
+    fle = open(full_path,'w')
+    fle.write(json.dumps(get_days()))
+
+
 def main():
     #print(get_country_names()[:5])
     #print(get_days()['India'])
-    print(country_days("Republic of Kosovo"))
+    #print(country_days("Republic of Kosovo"))
     #print(days_to_50('India'))
     write_csv('daysto50.csv')
+    write_json('countrydata.json')
     print('done')
 
 
