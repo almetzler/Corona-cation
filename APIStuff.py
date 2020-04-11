@@ -54,9 +54,26 @@ def get_days():
         data = json.loads(resp.text)
         if data == {"message":"Not Found"}:
             continue
+        start = True
         for day in data:
-            day_tups.append((count,day['Cases']))
-            count+=1
+            if start:
+                date = day['Date']
+                total=0
+                start=False
+
+            newdate = day['Date']
+
+            if newdate == date:
+                total += int(day['Cases'])
+
+            else:
+                day_tups.append((count,total))
+                total = int(day['Cases'])
+                count+=1
+
+            date=newdate
+            #some countries are also split into counties so I have to do something about that
+            
         country_dic[country] = day_tups
     return country_dic
 
@@ -68,11 +85,26 @@ def country_days(country):
     resp = requests.get(url)
     data = json.loads(resp.text)
     if data == {"message":"Not Found"}:
-        print(f'No data found for {country}')
+        print(f'data not found for {country}')
         return None
+    start = True
     for day in data:
-        day_tups.append((count,day['Cases']))
-        count+=1
+        if start:
+            date = day['Date']
+            total=0
+            start=False
+
+        newdate = day['Date']
+
+        if newdate == date:
+            total += int(day['Cases'])
+
+        else:
+            day_tups.append((count,total))
+            total = int(day['Cases'])
+            count+=1
+
+        date=newdate
     return day_tups
 
 # Task 3: Get days from 1 reported case to 50
@@ -110,8 +142,8 @@ def write_json(filename):
 def main():
     #print(get_country_names()[:5])
     #print(get_days()['India'])
-    #print(country_days("Republic of Kosovo"))
-    #print(days_to_50('India'))
+    #print(country_days("United States of America"))
+    #print(days_to_50('United states of america'))
     write_csv('daysto50.csv')
     write_json('countrydata.json')
     print('done')

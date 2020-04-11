@@ -1,14 +1,35 @@
 country,days to 50
-Portugal,9
+Italy,22
+San Marino,12
+Austria,10
+Czech Republic,10
+China,0
+Liechtenstein,19
+Slovakia,9
+Hungary,14
+Barbados,17
+Croatia,20
+Canada,41
+Palestinian Territory,17
+Senegal,20
+Lebanon,19
+Uzbekistan,10
+Lithuania,22
+Estonia,15
+Honduras,15
+Ecuador,16
+Andorra,17
+Cuba,13
 Netherlands,7
+Portugal,9
 Cameroon,17
+Oman,26
 Qatar,11
 Russian Federation,43
 Albania,7
-Oman,26
+Slovenia,6
 Djibouti,18
 Norway,7
-Slovenia,6
 Greece,11
 Panama,6
 Trinidad and Tobago,9
@@ -21,16 +42,16 @@ Cyprus,10
 Kenya,18
 Paraguay,19
 Sri Lanka,51
-Singapore,21
-South Africa,10
 Togo,31
 Turkey,7
 Uruguay,5
+Singapore,21
+South Africa,10
 Jordan,15
 United Kingdom,32
 Costa Rica,13
 Afghanistan,29
-Australia,187
+Australia,38
 Ukraine,19
 Indonesia,11
 Uganda,15
@@ -38,36 +59,36 @@ Saudi Arabia,11
 Malaysia,41
 Macedonia,23
 Bangladesh,23
-Jamaica,24
 Niger,12
+Jamaica,24
 Iran,5
 Algeria,20
 Iraq,12
 Romania,16
 Finland,42
 India,40
-Brazil,15
 Tunisia,16
+Brazil,15
 Kyrgyzstan,9
-Viet Nam,51
-Israel,16
 Madagascar,11
 Nigeria,26
 Philippines,42
-Brunei Darussalam,7
+Viet Nam,51
+Israel,16
 Guinea,20
 Poland,9
 Taiwan,52
+Brunei Darussalam,7
 Sweden,34
 Iceland,10
 Japan,25
 Kuwait,7
 Malta,12
-Argentina,13
-El Salvador,16
 Monaco,31
 New Zealand,22
 Spain,29
+Argentina,13
+El Salvador,16
 Bosnia and Herzegovina,14
 Burkina Faso,11
 Mexico,17
@@ -76,52 +97,31 @@ Pakistan,18
 Serbia,10
 Germany,33
 Kazakhstan,8
-United Arab Emirates,41
-Bolivia,16
 Latvia,16
 Switzerland,7
-Denmark,16
+United Arab Emirates,41
+Bolivia,16
+Denmark,11
 Bahrain,9
 Ireland,13
-United States of America,397
-Rwanda,13
-Luxembourg,14
+United States of America,39
 Mauritius,8
 Peru,10
-Armenia,15
-Cambodia,53
+Rwanda,13
+Luxembourg,14
 Dominican Republic,19
 France,35
 Guatemala,21
+Armenia,15
+Cambodia,53
 Belgium,31
 Chile,11
 Moldova,12
 Morocco,17
+Georgia,25
 Bulgaria,7
 Egypt,24
-Georgia,25
 Montenegro,8
-Azerbaijan,20
-Saint Vincent and Grenadines,26
+Saint Vincent and Grenadines,0
 Thailand,48
-San Marino,12
-Austria,10
-Czech Republic,10
-Italy,22
-China,5
-Hungary,14
-Liechtenstein,19
-Slovakia,9
-Barbados,17
-Canada,116
-Croatia,20
-Senegal,20
-Lebanon,19
-Palestinian Territory,17
-Uzbekistan,10
-Estonia,15
-Honduras,15
-Lithuania,22
-Andorra,17
-Cuba,13
-Ecuador,16
+Azerbaijan,20
