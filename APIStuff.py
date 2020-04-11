@@ -68,7 +68,7 @@ def country_days(country):
     resp = requests.get(url)
     data = json.loads(resp.text)
     if data == {"message":"Not Found"}:
-        print('No data found')
+        print(f'No data found for {country}')
         return None
     for day in data:
         day_tups.append((count,day['Cases']))
@@ -85,6 +85,7 @@ def days_to_50(country):
         if day[1] >50:
             return count
         count+=1
+    return None
 
 # Task 3: Write a csv of (country name, days to 50)
 def write_csv(filename):
@@ -93,16 +94,18 @@ def write_csv(filename):
     fle.write('country,days to 50')
     data = get_country_names()
     for country in data:
+        country = country.split(',')[0]
         if days_to_50(country) == None:
             continue
-        fle.write(f'\n{country},{days_to_50(country)}
+        fle.write(f'\n{country},{days_to_50(country)}')
     fle.close()
 
 def main():
     #print(get_country_names()[:5])
     #print(get_days()['India'])
-    print(country_days("India"))
-    print(days_to_50('India'))
+    print(country_days("Republic of Kosovo"))
+    #print(days_to_50('India'))
+    write_csv('daysto50.csv')
     print('done')
 
 
