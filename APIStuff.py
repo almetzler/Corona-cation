@@ -3,7 +3,7 @@ Game Plan:
 1) Make a list of Countries
 2) Get the date of their first case
 3) Get Date of 50th case
-4) find number of days between 1 and 50
+4) find number of days between 1 and 100
 5) put in all in a csv on github
     list of (country name , days from day 1 to day 50)
 6) maybe also create a json file of day by day number of cases
@@ -108,13 +108,13 @@ def country_days(country):
     return day_tups
 
 # Task 3: Get days from 1 reported case to 50
-def days_to_50(country):
+def days_to_100(country):
     count=0
     tups = country_days(country)
     if tups == None:
         return None
     for day in tups:
-        if day[1] >50:
+        if day[1] >100:
             return count
         count+=1
     return None
@@ -127,9 +127,9 @@ def write_csv(filename):
     data = get_country_names()
     for country in data:
         country = country.split(',')[0]
-        if days_to_50(country) == None:
+        if days_to_100(country) == None:
             continue
-        fle.write(f'\n{country},{days_to_50(country)}')
+        fle.write(f'\n{country},{days_to_100(country)}')
     fle.close()
 
 # Task 4: Dump json sting of dictionaty of day:tuples
@@ -142,9 +142,9 @@ def write_json(filename):
 def main():
     #print(get_country_names()[:5])
     #print(get_days()['India'])
-    #print(country_days("United States of America"))
+    #print(country_days("China"))
     #print(days_to_50('United states of america'))
-    write_csv('daysto50.csv')
+    write_csv('daysto100.csv')
     write_json('countrydata.json')
     print('done')
 
