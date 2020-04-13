@@ -1,6 +1,8 @@
 from bs4 import BeautifulSoup
 import requests
 import re
+import os
+import json
 
 def get_info_from_table():
     base_url = 'https://en.wikipedia.org/wiki/List_of_countries_by_GDP_(nominal)'
@@ -18,10 +20,14 @@ def get_info_from_table():
         gdp_info[country] = int(gdp)
     return gdp_info
 
-            
+def write_json(filename):
+    full_path = os.path.join(os.path.dirname(__file__), filename)
+    fle = open(full_path,'w')
+    fle.write(json.dumps(get_info_from_table()))         
 
 def main():
-    print(get_info_from_table())
+    get_info_from_table()
+    write_json('country_gdp_info.json')
 
 if __name__ == "__main__":
     main()
