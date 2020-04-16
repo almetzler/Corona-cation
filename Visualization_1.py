@@ -26,11 +26,12 @@ def plot_progessions(country):
     plt.xlabel('days since case 1')
     plt.ylabel('cases confirmed')
     plt.title(f'CORONA-CATION ({country})')
-    plt.show()
+    
 
 def main():
     plot_progessions("India")
-
+    plot_progessions("Germany")
+    plt.show()
 
 
 
