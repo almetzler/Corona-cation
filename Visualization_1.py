@@ -26,12 +26,26 @@ def plot_progessions(country):
     plt.xlabel('days since case 1')
     plt.ylabel('cases confirmed')
     plt.title(f'CORONA-CATION ({country})')
+    plt.show()
+    
+def plot_progessions_list(country_list,topvalue=None):
+    for country in country_list:
+        x,y=get_tups(country)
+        plt.plot(x,y)
+    plt.legend(country_list)
+    plt.xlabel('days since case 1')
+    plt.ylabel('cases confirmed')
+    plt.title(f'CORONA-CATION ({country})')
+    if topvalue:
+        plt.ylim(-1*topvalue/500,topvalue)
+    plt.show()
     
 
 def main():
-    plot_progessions("India")
-    plot_progessions("Germany")
-    plt.show()
+    #plot_progessions("India")
+    #plot_progessions("Germany")
+    plot_progessions_list(["India","Germany",'United States of America'],5000)
+    
 
 
 
