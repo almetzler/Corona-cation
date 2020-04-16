@@ -20,13 +20,16 @@ def get_tups(country):
         y_vals.append(line[1])
     return x_vals, y_vals
 
-def main():
-    x,y=get_tups('India')
+def plot_progessions(country):
+    x,y=get_tups(country)
     plt.plot(x,y)
     plt.xlabel('days since case 1')
     plt.ylabel('cases confirmed')
-    plt.title('CORONA-CATION')
+    plt.title(f'CORONA-CATION ({country})')
     plt.show()
+
+def main():
+    plot_progessions("India")
 
 
 
