@@ -32,7 +32,9 @@ for x in '123456789':
     if y>=5:
         break
 '''
-c_list=[1,2,3,4,5,6,7,8,9]
+c_list=[(1,2),(3,4),(5,6),7,8,9]
+slist=[str(x) for x in c_list]
+'''
 for c in c_list:
     if c>=7:
         break
@@ -42,3 +44,5 @@ for c in c_list:
         continue
     else:
         print(c)
+        '''
+print(','.join(slist))

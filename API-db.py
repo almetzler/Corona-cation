@@ -69,14 +69,14 @@ def days_to_100(country):
 
 def check_in_db(country,table,cur,conn):
     cur.execute(f"SELECT * FROM {table} WHERE country=?",(country,))
-    if cur.fetchone() != (None,):
-        return True
-    else:
+    if cur.fetchone() == None:
         return False
+    else:
+        return True
 
 def fill_Day1_table(cur,conn):
     print('filling table')    
-    cur.execute(f"SELECT COUNT (*) FROM Day1") # how many values do I currently have in my table
+    cur.execute("SELECT COUNT (*) FROM Day1") # how many values do I currently have in my table
     num = cur.fetchone()[0]
     print(num)
     count=0
@@ -85,32 +85,54 @@ def fill_Day1_table(cur,conn):
         if count>=20:
             break
         if check_in_db(c,'Day1',cur,conn):
+            print(f'{c} already in database')
             continue
         elif days_to_100(c)==None:
+            print(f'{c} is not at 100 yet')
             continue
         else:
             cur.execute("INSERT INTO Day1 (country, day) VALUES (?,?)",(c,days_to_100(c)))
+            print(f'writing data for {c}')
             count+=1
     conn.commit()
-    '''
-    startindx = cur.fetchone()[0] #assigns count of rows to my starting index
-    endindx = startindx + 20 #assigns my ending index to be 20 after my start
-    print(f'{startindx},{endindx}')
-    data = readDataFromFile(file) #returns dictionary of country:data
-    guide = list(data.keys()) # gives me an easy way to index into my dictionary
-    for i in range(startindx,endindx):
-        country = guide[i] #dictionry of country: case 100
-        day = data[country] #case 100
-        cur.execute("INSERT INTO Day1 (country, day) VALUES (?,?)",(country,day))
+
+def fill_Days_table(cur,conn):
+    print('filling table')    
+    cur.execute("SELECT COUNT (*) FROM Days") # how many values do I currently have in my table
+    num = cur.fetchone()[0]
+    print(num)
+    count=0
+    c_list = get_country_names()
+    for c in c_list:
+        if count>=20:
+            break
+        if check_in_db(c,'Days',cur,conn):
+            print(f'{c} already in database')
+            continue
+        elif country_days(c) == None:
+            print(f'no data found for {c}')
+            continue
+        else:
+            slist = [str(x) for x in country_days(c)]
+            string='\n'.join(slist)
+            if len(string) == 0:
+                print(f'no data found for {c}')
+                continue
+            cur.execute("INSERT INTO Days (country, '(day,cases)' ) VALUES (?,?)",(c,string))
+            print(f'writing data for {c}')
+            count+=1
     conn.commit()
-'''
+
 def main():
     path = os.path.dirname(os.path.abspath(__file__))
     conn = sqlite3.connect(path+'/'+'coronacation.db')
     cur = conn.cursor()
-    cur.execute("CREATE TABLE IF NOT EXISTS Days ('country' TEXT PRIMARY KEY, 'day' INTEGER, 'cases' INTEGER)")
-    cur.execute("CREATE TABLE IF NOT EXISTS Day1 ('country' TEXT PRIMARY KEY, 'day' INTEGER)")
-    fill_Day1_table(cur,conn)
+    cur.execute("CREATE TABLE IF NOT EXISTS Days ('country' TEXT PRIMARY KEY, '(day,cases)' TEXT)")
+    #cur.execute("CREATE TABLE IF NOT EXISTS Day1 ('country' TEXT PRIMARY KEY, 'day' INTEGER)")
+    #fill_Day1_table(cur,conn)
+    fill_Days_table(cur,conn)
+    #cur.execute("DROP TABLE IF EXISTS Days")
+    #cur.execute("DROP TABLE IF EXISTS Day1")
     print('done')
 
 if __name__ == "__main__":
