@@ -1,0 +1,1 @@
+The average number of days to get to 100 cases is 22.43548387096774.
