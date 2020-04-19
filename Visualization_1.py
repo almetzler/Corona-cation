@@ -24,7 +24,7 @@ def get_tups(country):
 def plot_progessions(country,topvalue=None):
     try:
         x,y=get_tups(country)
-        plt.plot(x,y,'.')
+        plt.plot(x,y)
         plt.xlabel('days since case 1')
         plt.ylabel('cases confirmed')
         plt.title(f'CORONA-CATION ({country})')
@@ -41,7 +41,7 @@ def plot_progessions_list(country_list,topvalue=None):
         title=''
         for country in country_list:
             x,y=get_tups(country)
-            plt.plot(x,y,'.')
+            plt.plot(x,y)
             title=title+country+', '
         plt.legend(country_list,loc='upper left')
         plt.xlabel('days since case 1')
@@ -56,9 +56,9 @@ def plot_progessions_list(country_list,topvalue=None):
 
 def main():
     #get_tups('Turkey')
-    plot_progessions("Norway")
+    #plot_progessions("Norway")
     #plot_progessions("Turky")
-    #plot_progessions_list(["Turkey","Norway",'Germany']) #produces correct figure
+    plot_progessions_list(["Turkey","Norway",'Germany']) #produces correct figure
     #plot_progessions_list(["India","Germay",'United States of America'],5000) #gives error
     
 
