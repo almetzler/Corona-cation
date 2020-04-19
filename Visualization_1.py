@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import json
+import sqlite3
 '''
 1) Get list of tuples
 2) Plot points
@@ -9,15 +10,18 @@ import json
 
 # get values
 def get_tups(country):
-    full_path = os.path.join(os.path.dirname(__file__), 'countrydata.json')
-    x_vals=[]
-    y_vals=[]
-    with open(full_path) as fle:
-        data = fle.read()
-        countrydic = json.loads(data)
-    for line in countrydic[country]:
-        x_vals.append(line[0])
-        y_vals.append(line[1])
+    path = os.path.dirname(os.path.abspath(__file__))
+    conn = sqlite3.connect(path+'/'+'coronacation.db')
+    cur = conn.cursor()
+    cur.execute("SELECT cases FROM Days WHERE country=?",(country,))
+    data_string = cur.fetchone()[0]
+    data_list = data_string.split('\n')
+    tup_list = [x.strip('()').split(',') for x in data_list]
+    x_vals = [x[0] for x in tup_list]
+    y_vals = [x[1] for x in tup_list]
+    print(tup_list[-10:])
+    print(x_vals[-10:])
+    print(y_vals[-10:])
     return x_vals, y_vals
 
 def plot_progessions(country,topvalue=None):
@@ -27,6 +31,7 @@ def plot_progessions(country,topvalue=None):
         plt.xlabel('days since case 1')
         plt.ylabel('cases confirmed')
         plt.title(f'CORONA-CATION ({country})')
+        plt.set_xscale
         if topvalue:
             plt.ylim(-1*topvalue/500,topvalue)
         plt.show()
@@ -52,10 +57,11 @@ def plot_progessions_list(country_list,topvalue=None):
     
 
 def main():
-    #plot_progessions("India") produces wanted figure
-    #plot_progessions("Gerany") gives error
-    #plot_progessions_list(["India","Germany",'United States of America'],5000) produces correct figure
-    #plot_progessions_list(["India","Germay",'United States of America'],5000) gives error
+    #get_tups('Turkey')
+    plot_progessions("Senegal")
+    #plot_progessions("Turky")
+    #plot_progessions_list(["Turkey","Norway",'United States of America'],5000) #produces correct figure
+    #plot_progessions_list(["India","Germay",'United States of America'],5000) #gives error
     
 
 
