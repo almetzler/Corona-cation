@@ -17,6 +17,7 @@ Things to do:
     something to check if a country is already in the table
 
 ''' 
+
 def get_country_names():
     country_list = []
     resp = requests.get('https://api.covid19api.com/countries')
