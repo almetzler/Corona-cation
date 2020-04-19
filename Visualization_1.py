@@ -55,8 +55,8 @@ def plot_progessions_list(country_list,topvalue=None):
     
 
 def main():
-    #get_tups('Turkey')
     #plot_progessions("Norway")
+    
     plot_progessions_list(["Turkey","Norway",'Germany']) 
     
 
