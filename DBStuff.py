@@ -2,7 +2,7 @@ import sqlite3
 import json
 import os
 
-'''
+''' 
 1) grab some functions from past assignments
     readDataFromFile        HW8
     setUpDatabase           HW8
@@ -77,6 +77,8 @@ def main():
     cur, conn = setUpDatabase('coronacation.db')
     setUpTables(cur,conn)
     fillDay1Table('daysto100.csv',cur,conn)
+    cur.execute("DROP TABLE IF EXISTS Days")
+    cur.execute("DROP TABLE IF EXISTS Day1")
 
 if __name__ == "__main__":
     main()
