@@ -57,9 +57,7 @@ def plot_progessions_list(country_list,topvalue=None):
 def main():
     #get_tups('Turkey')
     #plot_progessions("Norway")
-    #plot_progessions("Turky")
-    plot_progessions_list(["Turkey","Norway",'Germany']) #produces correct figure
-    #plot_progessions_list(["India","Germay",'United States of America'],5000) #gives error
+    plot_progessions_list(["Turkey","Norway",'Germany']) 
     
 
 
