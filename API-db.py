@@ -131,8 +131,6 @@ def main():
     cur.execute("CREATE TABLE IF NOT EXISTS Day1 ('country' TEXT PRIMARY KEY, 'day' INTEGER)")
     fill_Day1_table(cur,conn)
     fill_Days_table(cur,conn)
-    #cur.execute("DROP TABLE IF EXISTS Days")
-    #cur.execute("DROP TABLE IF EXISTS Day1")
     print('done')
 
 if __name__ == "__main__":
