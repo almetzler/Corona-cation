@@ -69,14 +69,14 @@ def days_to_100(country):
 
 def check_in_db(country,table,cur,conn):
     cur.execute(f"SELECT * FROM {table} WHERE country=?",(country,))
-    if cur.fetchone() != (None,):
-        return True
-    else:
+    if cur.fetchone() == None:
         return False
+    else:
+        return True
 
 def fill_Day1_table(cur,conn):
     print('filling table')    
-    cur.execute(f"SELECT COUNT (*) FROM Day1") # how many values do I currently have in my table
+    cur.execute("SELECT COUNT (*) FROM Day1") # how many values do I currently have in my table
     num = cur.fetchone()[0]
     print(num)
     count=0
@@ -85,11 +85,14 @@ def fill_Day1_table(cur,conn):
         if count>=20:
             break
         if check_in_db(c,'Day1',cur,conn):
+            print(f'{c} already in database')
             continue
         elif days_to_100(c)==None:
+            print(f'{c} is not at 100 yet')
             continue
         else:
             cur.execute("INSERT INTO Day1 (country, day) VALUES (?,?)",(c,days_to_100(c)))
+            print(f'writing data for {c}')
             count+=1
     conn.commit()
     '''
