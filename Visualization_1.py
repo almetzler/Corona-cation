@@ -17,21 +17,19 @@ def get_tups(country):
     data_string = cur.fetchone()[0]
     data_list = data_string.split('\n')
     tup_list = [x.strip('()').split(',') for x in data_list]
-    x_vals = [x[0] for x in tup_list]
-    y_vals = [x[1] for x in tup_list]
-    print(tup_list[-10:])
-    print(x_vals[-10:])
-    print(y_vals[-10:])
+    x_vals = [float(x[0]) for x in tup_list]
+    y_vals = [float(x[1]) for x in tup_list]
     return x_vals, y_vals
 
 def plot_progessions(country,topvalue=None):
     try:
         x,y=get_tups(country)
-        plt.plot(x,y)
+        plt.plot(x,y,'.')
         plt.xlabel('days since case 1')
         plt.ylabel('cases confirmed')
         plt.title(f'CORONA-CATION ({country})')
-        plt.set_xscale
+        plt.xscale('linear')
+        plt.yscale('linear')
         if topvalue:
             plt.ylim(-1*topvalue/500,topvalue)
         plt.show()
@@ -43,9 +41,9 @@ def plot_progessions_list(country_list,topvalue=None):
         title=''
         for country in country_list:
             x,y=get_tups(country)
-            plt.plot(x,y)
+            plt.plot(x,y,'.')
             title=title+country+', '
-        plt.legend(country_list)
+        plt.legend(country_list,loc='upper left')
         plt.xlabel('days since case 1')
         plt.ylabel('cases confirmed')
         plt.title(f'CORONA-CATION ({title[:-2]})')
@@ -58,9 +56,9 @@ def plot_progessions_list(country_list,topvalue=None):
 
 def main():
     #get_tups('Turkey')
-    plot_progessions("Senegal")
+    plot_progessions("Norway")
     #plot_progessions("Turky")
-    #plot_progessions_list(["Turkey","Norway",'United States of America'],5000) #produces correct figure
+    #plot_progessions_list(["Turkey","Norway",'Germany']) #produces correct figure
     #plot_progessions_list(["India","Germay",'United States of America'],5000) #gives error
     
 
