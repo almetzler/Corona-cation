@@ -19,6 +19,12 @@ Things to do:
 ''' 
 
 def get_country_names():
+    '''
+    Inputs: none
+    Outputs: a list of all of the country names that are listed on the API
+    The purpose of this function is to provide an iterable so that when later
+    going through the data we can make sure that we have gotten to all of the countries.
+    '''
     country_list = []
     resp = requests.get('https://api.covid19api.com/countries')
     data = json.loads(resp.text)
@@ -29,6 +35,14 @@ def get_country_names():
     return country_list
 
 def country_days(country):
+    '''
+    Inputs: a country name
+    Outputs: a list of (days since case 1, confirmed cases) tuples or None
+    The purpose of this function is to return a list of tuples for a given
+    country that can later be used to find the number of days to 100 cases
+    and can be written to one of our tables, if no data has been reported
+    for the country the function returns None.
+    '''
     count=0
     day_tups = []
     url = f'https://api.covid19api.com/dayone/country/{country}/status/confirmed'
@@ -58,6 +72,13 @@ def country_days(country):
     return day_tups
 
 def days_to_100(country):
+    '''
+    Inputs: a country name
+    Outputs: either None or an integer
+    The purpose of this function is to take a tuple list returned by country_days() 
+    and return the day on which the number of confirmed cases rose above 100. If the 
+    cases have yet to breach 100, the function returns None.
+    ''' 
     count=0
     tups = country_days(country)
     if tups == None:
@@ -69,6 +90,14 @@ def days_to_100(country):
     return None
 
 def check_in_db(country,table,cur,conn):
+    '''
+    Inputs: a country name, a table, a cursor, and a connection
+    Outputs: a boolean value
+    The purpose of this function is to determine whether data for
+    a given country has already been entered into a given table.
+    This can later be used to prevent duplicate values being entered
+    into a table.
+    '''
     cur.execute(f"SELECT * FROM {table} WHERE country=?",(country,))
     if cur.fetchone() == None:
         return False
@@ -76,6 +105,14 @@ def check_in_db(country,table,cur,conn):
         return True
 
 def fill_Day1_table(cur,conn):
+    ''' 
+    Inputs: a cursor and a connection
+    Outputs: None
+    The purpose of this function is to populate the table containing
+    the days to 100 days. It only sends 20 data points at a time and
+    ensures that no duplicate data points are entered by only adding
+    a value to the table if check_in_db returns False.
+    '''
     print('filling table')    
     cur.execute("SELECT COUNT (*) FROM Day1") # how many values do I currently have in my table
     num = cur.fetchone()[0]
@@ -98,6 +135,14 @@ def fill_Day1_table(cur,conn):
     conn.commit()
 
 def fill_Days_table(cur,conn):
+    '''
+    Inputs: a cursor and a connection
+    Outputs: None
+    The purpose of this function is to populate the table containing
+    the day-by-day data. It only sends 20 data points at a time and ensures
+    that no duplicate data points are entered by only adding a value to the
+    table if check_in_db returns False
+    '''
     print('filling table')    
     cur.execute("SELECT COUNT (*) FROM Days") # how many values do I currently have in my table
     num = cur.fetchone()[0]
@@ -125,6 +170,16 @@ def fill_Days_table(cur,conn):
     conn.commit()
 
 def main():
+    '''
+    Inputs: None
+    Outputs: None
+    The purpose of this function is to specify which functions within the
+    file should be called and the order in which they should be called. This
+    is where one would specify the inputs for each of the functions they
+    would like to use. We use this function to create the tables within our
+    database which we later populate using other functions. This is also where
+    we specify the database cursor and connection to be used in the other functions.
+    '''
     path = os.path.dirname(os.path.abspath(__file__))
     conn = sqlite3.connect(path+'/'+'coronacation.db')
     cur = conn.cursor()
