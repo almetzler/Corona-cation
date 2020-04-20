@@ -17,6 +17,10 @@ def calculate_average_days(cur, conn):
     fle.write(f'The average number of days to get to 100 cases is {average}.')
     fle.close()
 
+# Input: cursor and connection
+# Output: None
+# The purpose of calculate_average_days() is to write a text file named averagedays.txt to your local computer. This text file gives the average number of days to get to 100 cases of COVID-19
+
 
 def calculate_correlation(cur, conn):
     cur.execute("SELECT country FROM Day1")
@@ -44,6 +48,10 @@ def calculate_correlation(cur, conn):
     fle.write(f'The correlation between days to 100 cases and GDP is {math[0][1]}.')
     fle.close()
 
+# Input: cursor and connection
+# Output: None
+# The purpose of calculate_correlation() is to write a text file named correlation.txt to your local computer. This text file gives the correlation between the number of days to 100 cases and country GDP.
+
 
 def main():
     path = os.path.dirname(os.path.abspath(__file__))
@@ -51,6 +59,10 @@ def main():
     cur = conn.cursor()
     calculate_average_days(cur, conn)
     calculate_correlation(cur, conn)
+
+# Input: None
+# Output: None
+# The purpose of the main() function is to run the other functions in the file in a specified order. Additionally, this function specifies the database to pull information from and establishes a connection and cursor. 
 
 
 if __name__ == "__main__":

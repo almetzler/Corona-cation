@@ -23,6 +23,11 @@ def get_info_from_table(cur, conn):
         gdp_info[country] = int(gdp)
     return gdp_info
 
+# Inputs: cursor and connection 
+# Output: A dictionary named gdp_info that has the countries as the key and their GDP as the value
+# The purpose of the function get_info_from_table() is to create an iterable in order to go through while making tables in our database
+
+
 
 def fill_table(cur, conn, country_dict):
     cur.execute(f"SELECT COUNT (*) FROM 'GDP Info'")
@@ -37,6 +42,10 @@ def fill_table(cur, conn, country_dict):
             count += 1
     conn.commit()
 
+# Inputs: cursor, connection, dictionary with a country as key and GDP as the value
+# Output: None
+# The purpose of fill_table() is to create and populate a table in our database with each row containing a country and its GDP. The dictionary we take as input is the output of get_info_from_table()
+
 
 def main():
     path = os.path.dirname(os.path.abspath(__file__))
@@ -45,6 +54,10 @@ def main():
     cur.execute("CREATE TABLE IF NOT EXISTS 'GDP Info' ('Country'  TEXT PRIMARY KEY, 'GDP' INTEGER, UNIQUE ('Country', 'GDP'))")
     GDP_dict = get_info_from_table(cur, conn)
     fill_table(cur, conn, GDP_dict)
+
+# Input: None
+# Output: None
+# The purpose of the main() function is to run the other functions in the file in a specified order. Additionally, this function specifies the database to populate and creates a table if it does not already exist in the database. It also establishes a cursor and a connection.
 
 
 if __name__ == "__main__":

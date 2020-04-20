@@ -28,12 +28,20 @@ def scatterplot(cur, conn):
     plt.ylim(0, 500000)
     plt.show()
 
+# Inputs: cursor and connection
+# Output: A scatterplot of days to 100 cases vs. country GDP
+# The purpose of  scatterplot() is to create a visualization that displays the correlation between the number of days to get to 100 cases of COVID-19 and country GDP
+
 
 def main():
     path = os.path.dirname(os.path.abspath(__file__))
     conn = sqlite3.connect(path+'/'+'coronacation.db')
     cur = conn.cursor()
     scatterplot(cur, conn)
+
+# Input: None
+# Output: None
+# The purpose of the main() function is to run the other functions in the file in a specified order. Additionally, this function specifies the database to pull information from and establishes a connection and cursor.
 
 if __name__ == "__main__":
     main()
