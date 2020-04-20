@@ -29,7 +29,7 @@ def get_tups(country):
     y_vals = [float(x[1]) for x in tup_list]
     return x_vals, y_vals
 
-def plot_progessions(country,topvalue=None):
+def plot_progessions(country,topvalue=None,dayvalue=None):
     '''
     Inputs: a country name and an optional top value
     Outputs: a figure
@@ -49,11 +49,13 @@ def plot_progessions(country,topvalue=None):
         plt.yscale('linear')
         if topvalue:
             plt.ylim(-1*topvalue/500,topvalue)
+        if dayvalue:
+            plt.xlim(0,dayvalue)
         plt.show()
     except:
         print("error, something went wrong")
     
-def plot_progessions_list(country_list,topvalue=None):
+def plot_progessions_list(country_list,topvalue=None,dayvalue=None):
     '''
     Inputs: a list of country names and an optional top value
     Outputs: a figure
@@ -77,6 +79,8 @@ def plot_progessions_list(country_list,topvalue=None):
         plt.title(f'CORONA-CATION ({title[:-2]})')
         if topvalue:
             plt.ylim(-1*topvalue/500,topvalue)
+        if dayvalue:
+            plt.xlim(0,dayvalue)
         plt.show()
     except:
         print('error, something went wrong')
@@ -91,7 +95,7 @@ def main():
     called. This is where one would specify the inputs for each of the
     functions they would like to use.
     '''
-    #plot_progessions("Norway")
+    #plot_progessions("United States of America")
     plot_progessions_list(["Turkey","Norway",'Germany']) 
     
 
