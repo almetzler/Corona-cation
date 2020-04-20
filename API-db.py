@@ -18,7 +18,7 @@ Things to do:
 
 ''' 
 
-def get_country_names():
+def fill_IDs(cur,conn):
     '''
     Inputs: none
     Outputs: a list of all of the country names that are listed on the API
@@ -28,21 +28,22 @@ def get_country_names():
     country_list = []
     resp = requests.get('https://api.covid19api.com/countries')
     data = json.loads(resp.text)
-    
+    indx=0
     for country in data:
-        country_list.append(country['Country'])
-    
-    return country_list
-
+        c=country['Country']
+        country_list.append(c)
+        cur.execute("INSERT INTO IDs (id, country) VALUES (?,?)",(indx,c))
+        count+=1
+'''
 def country_days(country):
-    '''
+    
     Inputs: a country name
     Outputs: a list of (days since case 1, confirmed cases) tuples or None
     The purpose of this function is to return a list of tuples for a given
     country that can later be used to find the number of days to 100 cases
     and can be written to one of our tables, if no data has been reported
     for the country the function returns None.
-    '''
+    
     count=0
     day_tups = []
     url = f'https://api.covid19api.com/dayone/country/{country}/status/confirmed'
@@ -70,15 +71,45 @@ def country_days(country):
 
         date=newdate
     return day_tups
+'''
+def fill_Days_table(cur,conn):
+    cur.execute("SELECT * FROM IDs")
+    for row in cur:
+        url = f'https://api.covid19api.com/dayone/country/{row[1]}/status/confirmed'
+        resp = requests.get(url)
+        data = json.loads(resp.text)
+        c_id = row[0]
+        if data == {"message":"Not Found"}:
+            #print(f'data not found for {country}')
+            cur.execute("INSERT INTO Days (id,day,cases) VALUES (?,?,?)", (c_id,None,None))
+        start = True
+        for day in data:
+            if start:
+                date = day['Date']
+                total=0
+                start=False
 
+            newdate = day['Date']
+
+            if newdate == date:
+                total += int(day['Cases'])
+
+            else:
+                cur.execute("INSERT INTO Days (id,day,cases) VALUES (?,?,?)", (c_id,count,total))
+                total = int(day['Cases'])
+                count+=1
+
+            date=newdate
+
+'''
 def days_to_100(country):
-    '''
+    
     Inputs: a country name
     Outputs: either None or an integer
     The purpose of this function is to take a tuple list returned by country_days() 
     and return the day on which the number of confirmed cases rose above 100. If the 
     cases have yet to breach 100, the function returns None.
-    ''' 
+    
     count=0
     tups = country_days(country)
     if tups == None:
@@ -88,7 +119,7 @@ def days_to_100(country):
             return count
         count+=1
     return None
-
+'''
 def check_in_db(country,table,cur,conn):
     '''
     Inputs: a country name, a table, a cursor, and a connection
@@ -98,7 +129,9 @@ def check_in_db(country,table,cur,conn):
     This can later be used to prevent duplicate values being entered
     into a table.
     '''
-    cur.execute(f"SELECT * FROM {table} WHERE country=?",(country,))
+    cur.execute("SELECT id FROM IDs WHERE country=?",(country,))
+    c_id = cur.fetchone()[0]
+    cur.execute(f"SELECT * FROM {table} WHERE id=?",(c_id,))
     if cur.fetchone() == None:
         return False
     else:
@@ -118,7 +151,7 @@ def fill_Day1_table(cur,conn):
     num = cur.fetchone()[0]
     print(num)
     count=0
-    c_list = get_country_names()
+    c_list = get_country_names(cur,conn)
     for c in c_list:
         if count>=20:
             break
@@ -129,7 +162,9 @@ def fill_Day1_table(cur,conn):
             #print(f'{c} is not at 100 yet')
             continue
         else:
-            cur.execute("INSERT INTO Day1 (country, day) VALUES (?,?)",(c,days_to_100(c)))
+            cur.execute("SELECT * FROM IDs WHERE country=?",(c,))
+            country = cur.fetchone()[0]
+            cur.execute("INSERT INTO Day1 (country, day) VALUES (?,?)",(country,days_to_100(c)))
             #print(f'writing data for {c}')
             count+=1
     conn.commit()
@@ -148,7 +183,7 @@ def fill_Days_table(cur,conn):
     num = cur.fetchone()[0]
     print(num)
     count=0
-    c_list = get_country_names()
+    c_list = get_country_names(cur,conn)
     for c in c_list:
         if count>=20:
             break
@@ -183,10 +218,14 @@ def main():
     path = os.path.dirname(os.path.abspath(__file__))
     conn = sqlite3.connect(path+'/'+'coronacation.db')
     cur = conn.cursor()
-    cur.execute("CREATE TABLE IF NOT EXISTS Days ('country' TEXT PRIMARY KEY, cases TEXT)")
-    cur.execute("CREATE TABLE IF NOT EXISTS Day1 ('country' TEXT PRIMARY KEY, 'day' INTEGER)")
-    fill_Day1_table(cur,conn)
-    fill_Days_table(cur,conn)
+    cur.execute("CREATE TABLE IF NOT EXISTS IDs ('id' Integer PRIMARY KEY, 'country' TEXT)")
+    cur.execute("CREATE TABLE IF NOT EXISTS Days ('id' TEXT PRIMARY KEY, day, INTEGER, cases INTEGER)")
+    cur.execute("CREATE TABLE IF NOT EXISTS Day1 ('id' TEXT PRIMARY KEY, 'day' INTEGER)")
+    #cur.execute("DROP TABLE IF EXISTS Days")
+    #cur.execute("DROP TABLE IF EXISTS IDs")
+    #cur.execute("DROP TABLE IF EXISTS Day1")
+    #fill_Day1_table(cur,conn)
+    #fill_Days_table(cur,conn)
     print('done')
 
 if __name__ == "__main__":
