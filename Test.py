@@ -48,9 +48,9 @@ for c in c_list:
         print(c)
 
 print(','.join(slist))
+'''
 
-
-print(fuzz.partial_ratio("Taiwan", "Taiwan, Republic of China"))
+print(fuzz.partial_ratio("Korea,North", "Korea(North)"))
 print('done')
 '''
 def cdict():
@@ -58,3 +58,4 @@ def cdict():
     data = json.loads(resp.text)
     return data
 print(cdict()[0])
+'''
