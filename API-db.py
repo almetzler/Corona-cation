@@ -94,7 +94,7 @@ def fill_Day1_table(cur,conn):
     ensures that no duplicate data points are entered by only adding
     a value to the table if check_in_db returns False.
     '''
-    print('filling table')    
+    print('filling Day1 table')    
     cur.execute("SELECT COUNT (*) FROM Day1") # how many values do I currently have in my table
     num = cur.fetchone()[0]
     count=0
@@ -133,10 +133,6 @@ def main():
     fill_IDs(cur,conn)
     fill_Days_table(cur,conn)
     fill_Day1_table(cur,conn)
-
-    #cur.execute("DROP TABLE IF EXISTS Days")
-    #cur.execute("DROP TABLE IF EXISTS IDs")
-    #cur.execute("DROP TABLE IF EXISTS Day1")
     print('done')
 
 if __name__ == "__main__":
