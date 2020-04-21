@@ -50,9 +50,9 @@ for c in c_list:
 print(','.join(slist))
 '''
 
-print(fuzz.partial_ratio("macao-sar-china", "china"))
+print(fuzz.token_sort_ratio("united states of america", "united states"))
 print('done')
-
+'''
 def get_country_id(cur, conn, country):
     cur.execute("SELECT * FROM IDs")
     for row in cur:
@@ -69,7 +69,7 @@ cur = conn.cursor()
 
 print(get_country_id(cur, conn, 'Taiwan'))
 
-'''
+
 def cdict():
     resp = requests.get('https://api.covid19api.com/countries')
     data = json.loads(resp.text)

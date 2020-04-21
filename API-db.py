@@ -21,11 +21,11 @@ Things to do:
 def fill_IDs(cur,conn):
     '''
     Inputs: none
-    Outputs: a list of all of the country names that are listed on the API
-    The purpose of this function is to provide an iterable so that when later
-    going through the data we can make sure that we have gotten to all of the countries.
+    Outputs: none
+    The purpose of this function is to populate a table with all
+    of the countries which have data on the API and assign each
+    with a unique id number that can be used in the other tables.
     '''
-    country_list = []
     resp = requests.get('https://api.covid19api.com/countries')
     data = json.loads(resp.text)
     indx=1
@@ -90,9 +90,11 @@ def fill_Day1_table(cur,conn):
     Inputs: a cursor and a connection
     Outputs: None
     The purpose of this function is to populate the table containing
-    the days to 100 days. It only sends 20 data points at a time and
-    ensures that no duplicate data points are entered by only adding
-    a value to the table if check_in_db returns False.
+    the days to 100 cases. It only sends 20 data points at a time and
+    ensures that no duplicate data points are entered by utilizing
+    insert or ignore. t finds the day by using the built in SQL min
+    function and calling it on all of the Days entries which have a
+    certain country id and have cases > 100.
     '''
     print('filling Day1 table')    
     cur.execute("SELECT COUNT (*) FROM Day1") # how many values do I currently have in my table
