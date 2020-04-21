@@ -49,5 +49,5 @@ for c in c_list:
 print(','.join(slist))
 '''
 
-print(fuzz.partial_ratio("North Korea", "Korea North"))
+print(fuzz.partial_ratio("Taiwan", "Taiwan, Republic of China"))
 print('done')

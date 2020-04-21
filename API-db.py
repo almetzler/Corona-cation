@@ -25,15 +25,15 @@ def fill_IDs(cur,conn):
     The purpose of this function is to provide an iterable so that when later
     going through the data we can make sure that we have gotten to all of the countries.
     '''
-    country_list = []
     resp = requests.get('https://api.covid19api.com/countries')
     data = json.loads(resp.text)
-    indx=0
+    indx=1
     for country in data:
         c=country['Country']
-        country_list.append(c)
-        cur.execute("INSERT INTO IDs (id, country) VALUES (?,?)",(indx,c))
-        count+=1
+        cur.execute("INSERT OR IGNORE INTO IDs (id, country) VALUES (?,?)",(indx,c))
+        #print((indx,c))
+        indx+=1
+    conn.commit()
 '''
 def country_days(country):
     
@@ -74,32 +74,45 @@ def country_days(country):
 '''
 def fill_Days_table(cur,conn):
     cur.execute("SELECT * FROM IDs")
-    for row in cur:
-        url = f'https://api.covid19api.com/dayone/country/{row[1]}/status/confirmed'
-        resp = requests.get(url)
-        data = json.loads(resp.text)
+    countries = cur.fetchall()
+    for row in countries:
+        print(row)
+        count=0
         c_id = row[0]
-        if data == {"message":"Not Found"}:
-            #print(f'data not found for {country}')
-            cur.execute("INSERT INTO Days (id,day,cases) VALUES (?,?,?)", (c_id,None,None))
-        start = True
-        for day in data:
-            if start:
-                date = day['Date']
-                total=0
-                start=False
+        try:
+            url = f'https://api.covid19api.com/dayone/country/{row[1]}/status/confirmed'
+            resp = requests.get(url)
+            data = json.loads(resp.text)
+            if data == {"message":"Not Found"}:
+                print(f'data not found for {row[1]}')
+                cur.execute("INSERT OR IGNORE INTO Days (id,day,cases) VALUES (?,?,?)", (c_id,None,None))
+                continue
+            if len(data) == 0:
+                print(f'data not found for {row[1]}')
+                cur.execute("INSERT OR IGNORE INTO Days (id,day,cases) VALUES (?,?,?)", (c_id,None,None))
+                continue
+            start = True
+            for day in data:
+                if start:
+                    date = day['Date']
+                    total=0
+                    start=False
+                newdate = day['Date']
+                #print(total)
+                if newdate == date:
+                    total += int(day['Cases'])
+                else:
+                    cur.execute("INSERT OR IGNORE INTO Days (id,day,cases) VALUES (?,?,?)", (c_id,count,total))
+                    #print((c_id,count,total))
+                    total = int(day['Cases'])
+                    count+=1
+                date=newdate
+        except:
+            print(f'data not found for {row[1]}')
+            cur.execute("INSERT OR IGNORE INTO Days (id,day,cases) VALUES (?,?,?)", (c_id,None,None))
+        conn.commit()
+    
 
-            newdate = day['Date']
-
-            if newdate == date:
-                total += int(day['Cases'])
-
-            else:
-                cur.execute("INSERT INTO Days (id,day,cases) VALUES (?,?,?)", (c_id,count,total))
-                total = int(day['Cases'])
-                count+=1
-
-            date=newdate
 
 '''
 def days_to_100(country):
@@ -120,23 +133,22 @@ def days_to_100(country):
         count+=1
     return None
 '''
-def check_in_db(country,table,cur,conn):
-    '''
+'''
+def check_in_db(c_id,table,cur,conn):
+    
     Inputs: a country name, a table, a cursor, and a connection
     Outputs: a boolean value
     The purpose of this function is to determine whether data for
     a given country has already been entered into a given table.
     This can later be used to prevent duplicate values being entered
     into a table.
-    '''
-    cur.execute("SELECT id FROM IDs WHERE country=?",(country,))
-    c_id = cur.fetchone()[0]
+    
     cur.execute(f"SELECT * FROM {table} WHERE id=?",(c_id,))
     if cur.fetchone() == None:
         return False
     else:
         return True
-
+'''
 def fill_Day1_table(cur,conn):
     ''' 
     Inputs: a cursor and a connection
@@ -151,33 +163,27 @@ def fill_Day1_table(cur,conn):
     num = cur.fetchone()[0]
     print(num)
     count=0
-    c_list = get_country_names(cur,conn)
-    for c in c_list:
+    cur.execute("SELECT * FROM IDs")
+    for row in cur:
         if count>=20:
             break
-        if check_in_db(c,'Day1',cur,conn):
-            #print(f'{c} already in database')
-            continue
-        elif days_to_100(c)==None:
-            #print(f'{c} is not at 100 yet')
-            continue
-        else:
-            cur.execute("SELECT * FROM IDs WHERE country=?",(c,))
-            country = cur.fetchone()[0]
-            cur.execute("INSERT INTO Day1 (country, day) VALUES (?,?)",(country,days_to_100(c)))
-            #print(f'writing data for {c}')
-            count+=1
-    conn.commit()
-
+        c_id = row[0]
+        cur.execute("SELECT MIN(day) FROM Days WHERE id=? AND cases>?",(c_id,100))
+        day = cur.fetchone()[0]
+        cur.execute("INSERT OR IGNORE INTO Day1 (id, day) VALUES (?,?)",(c_id,day))
+        #print(f'writing data for {c}')
+        count+=1
+        conn.commit()
+'''
 def fill_Days_table(cur,conn):
-    '''
+    
     Inputs: a cursor and a connection
     Outputs: None
     The purpose of this function is to populate the table containing
     the day-by-day data. It only sends 20 data points at a time and ensures
     that no duplicate data points are entered by only adding a value to the
     table if check_in_db returns False
-    '''
+    
     print('filling table')    
     cur.execute("SELECT COUNT (*) FROM Days") # how many values do I currently have in my table
     num = cur.fetchone()[0]
@@ -203,7 +209,7 @@ def fill_Days_table(cur,conn):
             #print(f'writing data for {c}')
             count+=1
     conn.commit()
-
+'''
 def main():
     '''
     Inputs: None
@@ -218,14 +224,17 @@ def main():
     path = os.path.dirname(os.path.abspath(__file__))
     conn = sqlite3.connect(path+'/'+'coronacation.db')
     cur = conn.cursor()
-    cur.execute("CREATE TABLE IF NOT EXISTS IDs ('id' Integer PRIMARY KEY, 'country' TEXT)")
-    cur.execute("CREATE TABLE IF NOT EXISTS Days ('id' TEXT PRIMARY KEY, day, INTEGER, cases INTEGER)")
-    cur.execute("CREATE TABLE IF NOT EXISTS Day1 ('id' TEXT PRIMARY KEY, 'day' INTEGER)")
+    cur.execute("CREATE TABLE IF NOT EXISTS IDs ('id' INTEGER PRIMARY KEY, 'country' TEXT,UNIQUE (id,country))")
+    cur.execute("CREATE TABLE IF NOT EXISTS Days ('id' INTEGER, day INTEGER, cases INTEGER,UNIQUE(id,day,cases))")
+    cur.execute("CREATE TABLE IF NOT EXISTS Day1 ('id' INTEGER PRIMARY KEY, 'day' INTEGER,UNIQUE(id,day))")
+    
+    fill_IDs(cur,conn)
+    #fill_Day1_table(cur,conn)
+    fill_Days_table(cur,conn)
+
     #cur.execute("DROP TABLE IF EXISTS Days")
     #cur.execute("DROP TABLE IF EXISTS IDs")
     #cur.execute("DROP TABLE IF EXISTS Day1")
-    #fill_Day1_table(cur,conn)
-    #fill_Days_table(cur,conn)
     print('done')
 
 if __name__ == "__main__":
