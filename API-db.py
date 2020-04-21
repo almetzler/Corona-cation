@@ -25,12 +25,14 @@ def fill_IDs(cur,conn):
     The purpose of this function is to provide an iterable so that when later
     going through the data we can make sure that we have gotten to all of the countries.
     '''
+    country_list = []
     resp = requests.get('https://api.covid19api.com/countries')
     data = json.loads(resp.text)
     indx=1
     for country in data:
         c=country['Country']
-        cur.execute("INSERT OR IGNORE INTO IDs (id, country) VALUES (?,?)",(indx,c))
+        s=country['Slug']
+        cur.execute("INSERT OR IGNORE INTO IDs (id, country, slug) VALUES (?,?,?)",(indx,c,s))
         #print((indx,c))
         indx+=1
     conn.commit()
@@ -76,19 +78,23 @@ def fill_Days_table(cur,conn):
     cur.execute("SELECT * FROM IDs")
     countries = cur.fetchall()
     for row in countries:
-        print(row)
         count=0
         c_id = row[0]
+        cur.execute("SELECT * FROM Days WHERE id = ?",(c_id,))
+        if cur.fetchone()!=None:
+            #print(f'{row[1]} already written')
+            continue
+        #print(row)
         try:
-            url = f'https://api.covid19api.com/dayone/country/{row[1]}/status/confirmed'
+            url = f'https://api.covid19api.com/dayone/country/{row[2]}/status/confirmed'
             resp = requests.get(url)
             data = json.loads(resp.text)
             if data == {"message":"Not Found"}:
-                print(f'data not found for {row[1]}')
+                #print(f'data not found for {row[1]}')
                 cur.execute("INSERT OR IGNORE INTO Days (id,day,cases) VALUES (?,?,?)", (c_id,None,None))
                 continue
             if len(data) == 0:
-                print(f'data not found for {row[1]}')
+                #print(f'data not found for {row[1]}')
                 cur.execute("INSERT OR IGNORE INTO Days (id,day,cases) VALUES (?,?,?)", (c_id,None,None))
                 continue
             start = True
@@ -111,6 +117,7 @@ def fill_Days_table(cur,conn):
             print(f'data not found for {row[1]}')
             cur.execute("INSERT OR IGNORE INTO Days (id,day,cases) VALUES (?,?,?)", (c_id,None,None))
         conn.commit()
+    print('done filling Days')
     
 
 
@@ -161,11 +168,11 @@ def fill_Day1_table(cur,conn):
     print('filling table')    
     cur.execute("SELECT COUNT (*) FROM Day1") # how many values do I currently have in my table
     num = cur.fetchone()[0]
-    print(num)
     count=0
     cur.execute("SELECT * FROM IDs")
-    for row in cur:
-        if count>=20:
+    c_list = cur.fetchall()
+    for row in c_list:
+        if count>=num+20:
             break
         c_id = row[0]
         cur.execute("SELECT MIN(day) FROM Days WHERE id=? AND cases>?",(c_id,100))
@@ -174,6 +181,7 @@ def fill_Day1_table(cur,conn):
         #print(f'writing data for {c}')
         count+=1
         conn.commit()
+    print(f'there are currently {num} rows in Day1.')
 '''
 def fill_Days_table(cur,conn):
     
@@ -224,12 +232,12 @@ def main():
     path = os.path.dirname(os.path.abspath(__file__))
     conn = sqlite3.connect(path+'/'+'coronacation.db')
     cur = conn.cursor()
-    cur.execute("CREATE TABLE IF NOT EXISTS IDs ('id' INTEGER PRIMARY KEY, 'country' TEXT,UNIQUE (id,country))")
+    cur.execute("CREATE TABLE IF NOT EXISTS IDs ('id' INTEGER PRIMARY KEY, 'country' TEXT, 'slug' TEXT,UNIQUE (id,country,slug))")
     cur.execute("CREATE TABLE IF NOT EXISTS Days ('id' INTEGER, day INTEGER, cases INTEGER,UNIQUE(id,day,cases))")
     cur.execute("CREATE TABLE IF NOT EXISTS Day1 ('id' INTEGER PRIMARY KEY, 'day' INTEGER,UNIQUE(id,day))")
     
     fill_IDs(cur,conn)
-    #fill_Day1_table(cur,conn)
+    fill_Day1_table(cur,conn)
     fill_Days_table(cur,conn)
 
     #cur.execute("DROP TABLE IF EXISTS Days")

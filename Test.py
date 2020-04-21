@@ -1,4 +1,5 @@
 import sqlite3
+import requests
 import json
 import os
 from fuzzywuzzy import fuzz
@@ -47,7 +48,13 @@ for c in c_list:
         print(c)
 
 print(','.join(slist))
-'''
+
 
 print(fuzz.partial_ratio("Taiwan", "Taiwan, Republic of China"))
 print('done')
+'''
+def cdict():
+    resp = requests.get('https://api.covid19api.com/countries')
+    data = json.loads(resp.text)
+    return data
+print(cdict()[0])
