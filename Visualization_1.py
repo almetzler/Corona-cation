@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import os
 import json
 import sqlite3
+from fuzzywuzzy import fuzz
 '''
 1) Get list of tuples
 2) Plot points
@@ -21,12 +22,16 @@ def get_tups(country):
     path = os.path.dirname(os.path.abspath(__file__))
     conn = sqlite3.connect(path+'/'+'coronacation.db')
     cur = conn.cursor()
-    cur.execute("SELECT cases FROM Days WHERE country=?",(country,))
-    data_string = cur.fetchone()[0]
-    data_list = data_string.split('\n')
-    tup_list = [x.strip('()').split(',') for x in data_list]
-    x_vals = [float(x[0]) for x in tup_list]
-    y_vals = [float(x[1]) for x in tup_list]
+    c_id = None
+    cur.execute("SELECT * FROM IDs")
+    for row in cur:
+        c = row[1].split(',')
+        if fuzz.partial_ratio(country, c[0]) >= 90:
+            c_id = row[0]
+    cur.execute("SELECT day,cases FROM Days WHERE id=?",(c_id,))
+    day_tups = cur.fetchall()
+    x_vals = [float(x[0]) for x in day_tups]
+    y_vals = [float(x[1]) for x in day_tups]
     return x_vals, y_vals
 
 def plot_progessions(country,topvalue=None,dayvalue=None):
@@ -95,8 +100,8 @@ def main():
     called. This is where one would specify the inputs for each of the
     functions they would like to use.
     '''
-    #plot_progessions("United States of America")
-    plot_progessions_list(["Turkey","Norway",'Germany']) 
+    plot_progessions("United States of America")
+    #plot_progessions_list(["Turkey","Norway",'Germany']) 
     
 
 
