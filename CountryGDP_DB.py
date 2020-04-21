@@ -4,6 +4,7 @@ import re
 import os
 import json
 import sqlite3
+from fuzzywuzzy import fuzz
 
 def get_info_from_table(cur, conn):
     base_url = 'https://en.wikipedia.org/wiki/List_of_countries_by_GDP_(nominal)'
@@ -27,7 +28,17 @@ def get_info_from_table(cur, conn):
 # Output: A dictionary named gdp_info that has the countries as the key and their GDP as the value
 # The purpose of the function get_info_from_table() is to create an iterable in order to go through while making tables in our database
 
+def get_country_id(cur, conn, country):
+    cur.execute("SELECT * FROM IDs")
+    for row in cur:
+        c = row[1].split(',')
+        if fuzz.partial_ratio(country, c[0]) >= 90:
+            return row[0]
+    return 0
 
+# Inputs: cursor, connection, and country name
+# Outputs: if the  ratio of similarity is high enough, it will return a country ID...if not it returns zero
+# The purpose of this function is to assign a country ID to all of the countries in the table
 
 def fill_table(cur, conn, country_dict):
     cur.execute(f"SELECT COUNT (*) FROM 'GDP Info'")
@@ -38,7 +49,7 @@ def fill_table(cur, conn, country_dict):
         if count >= 20:
             break
         else:
-            cur.execute("INSERT OR IGNORE INTO 'GDP Info' (Country, GDP) VALUES (?, ?)", (country, country_dict[country]))
+            cur.execute("INSERT OR IGNORE INTO 'GDP Info' ('Country ID', GDP) VALUES (?, ?)", (get_country_id(cur, conn, country), country_dict[country]))
             count += 1
     conn.commit()
 
@@ -51,7 +62,8 @@ def main():
     path = os.path.dirname(os.path.abspath(__file__))
     conn = sqlite3.connect(path+'/'+'coronacation.db')
     cur = conn.cursor()
-    cur.execute("CREATE TABLE IF NOT EXISTS 'GDP Info' ('Country'  TEXT PRIMARY KEY, 'GDP' INTEGER, UNIQUE ('Country', 'GDP'))")
+    #cur.execute("DROP TABLE IF EXISTS 'GDP Info'")
+    cur.execute("CREATE TABLE IF NOT EXISTS 'GDP Info' ('Country ID'  INTEGER PRIMARY KEY, 'GDP' INTEGER, UNIQUE ('Country ID', 'GDP'))")
     GDP_dict = get_info_from_table(cur, conn)
     fill_table(cur, conn, GDP_dict)
 

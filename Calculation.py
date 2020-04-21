@@ -3,12 +3,13 @@ import os
 import numpy as np
 
 def calculate_average_days(cur, conn):
-    cur.execute("SELECT day FROM Day1")
+    cur.execute("SELECT * FROM Day1")
     country_list = cur.fetchall()
     count = 0
 
     for country in country_list:
-        count += country[0]
+        if country[1] != None: 
+            count += country[1]
 
     average = count / len(country_list)
 
@@ -23,22 +24,23 @@ def calculate_average_days(cur, conn):
 
 
 def calculate_correlation(cur, conn):
-    cur.execute("SELECT country FROM Day1")
-    country_list1 = cur.fetchall()
+    cur.execute("SELECT * FROM 'GDP Info'")
+    country_list = cur.fetchall()
     gdp_day_list = []
-    for country in country_list1:
+    for country in country_list:
         try:
-            cur.execute("SELECT 'GDP Info'.'GDP', Day1.day FROM 'GDP Info' JOIN Day1 ON 'GDP Info'.Country = Day1.country WHERE Day1.country = ?", (country[0],))
+            cur.execute("SELECT 'GDP Info'.'GDP', Day1.day FROM 'GDP Info' JOIN Day1 ON 'GDP Info'.'Country ID' = Day1.id WHERE Day1.id = ?", (country[0],))
             gdp_day = cur.fetchone()
             gdp_day_list.append(gdp_day)
         except:
             continue
+
     x_vals = []
     y_vals = []
-    for item in gdp_day_list:
-        if item != None:
-            x_vals.append(item[1])
-            y_vals.append(item[0])
+    val_list = [x for x in gdp_day_list[1:] if None not in x]
+    for item in val_list:
+        x_vals.append(item[1])
+        y_vals.append(item[0])
 
     math = np.corrcoef(x_vals, y_vals)
     print(math)

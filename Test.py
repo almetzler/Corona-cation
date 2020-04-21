@@ -50,8 +50,25 @@ for c in c_list:
 print(','.join(slist))
 '''
 
-print(fuzz.partial_ratio("Korea,North", "Korea(North)"))
+print(fuzz.partial_ratio("macao-sar-china", "china"))
 print('done')
+
+def get_country_id(cur, conn, country):
+    cur.execute("SELECT * FROM IDs")
+    for row in cur:
+        c = row[1].split(',')
+        print(c[0])
+        if fuzz.partial_ratio(country, c[0]) >= 90:
+            return row[0]
+    return 0
+
+
+path = os.path.dirname(os.path.abspath(__file__))
+conn = sqlite3.connect(path+'/'+'coronacation.db')
+cur = conn.cursor()
+
+print(get_country_id(cur, conn, 'Taiwan'))
+
 '''
 def cdict():
     resp = requests.get('https://api.covid19api.com/countries')
