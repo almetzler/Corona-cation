@@ -4,16 +4,17 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 def scatterplot(cur, conn):
-    cur.execute("SELECT country FROM Day1")
+    cur.execute("SELECT * FROM 'GDP Info'")
     country_list = cur.fetchall()
     gdp_day_list = []
     for country in country_list:
         try:
-            cur.execute("SELECT 'GDP Info'.'GDP', Day1.day FROM 'GDP Info' JOIN Day1 ON 'GDP Info'.Country = Day1.country WHERE Day1.country = ?", (country[0],))
+            cur.execute("SELECT 'GDP Info'.'GDP', Day1.day FROM 'GDP Info' JOIN Day1 ON 'GDP Info'.'Country ID' = Day1.id WHERE Day1.id = ?", (country[0],))
             gdp_day = cur.fetchone()
             gdp_day_list.append(gdp_day)
         except:
             continue
+
     x_vals = []
     y_vals = []
     for item in gdp_day_list:
@@ -21,11 +22,13 @@ def scatterplot(cur, conn):
             x_vals.append(item[1])
             y_vals.append(item[0])
 
+    print(len(x_vals))
+
     plt.plot(x_vals,y_vals,'b.')
     plt.xlabel('Days From 1 Case to 100')
     plt.ylabel('GDP')
     plt.title('Correlation Between Days to 100 Cases and GDP')
-    plt.ylim(0, 500000)
+    plt.yscale('log')
     plt.show()
 
 # Inputs: cursor and connection
