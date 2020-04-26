@@ -38,6 +38,15 @@ def fill_IDs(cur,conn):
     conn.commit()
 
 def fill_Days_table(cur,conn):
+    '''
+    Inputs: a cursor and a connection
+    Outputs: None
+    The purpose of this function is to populate the table containing
+    the day-by-day data. It does this by going into each country and
+    adding every unique (country_id, day since first case, confirmed
+    cases). This allows for the use of the built in min function when
+    populating at Day1.
+    '''
     cur.execute("SELECT * FROM IDs")
     countries = cur.fetchall()
     for row in countries:
