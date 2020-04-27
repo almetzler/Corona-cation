@@ -62,7 +62,6 @@ def main():
     path = os.path.dirname(os.path.abspath(__file__))
     conn = sqlite3.connect(path+'/'+'coronacation.db')
     cur = conn.cursor()
-    #cur.execute("DROP TABLE IF EXISTS 'GDP Info'")
     cur.execute("CREATE TABLE IF NOT EXISTS 'GDP Info' ('Country ID'  INTEGER PRIMARY KEY, 'GDP' INTEGER, UNIQUE ('Country ID', 'GDP'))")
     GDP_dict = get_info_from_table(cur, conn)
     fill_table(cur, conn, GDP_dict)
